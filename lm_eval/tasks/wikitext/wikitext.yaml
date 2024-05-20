@@ -1,6 +1,6 @@
 task: wikitext
 dataset_path: EleutherAI/wikitext_document_level
-dataset_name: wikitext-2-raw-v1
+dataset_name: wikitext-103-raw-v1
 output_type: loglikelihood_rolling
 training_split: train
 validation_split: validation

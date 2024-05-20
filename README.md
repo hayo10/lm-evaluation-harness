@@ -29,6 +29,7 @@ lm_eval --model mamba_ssm \
     --tasks xsum_summary \
     --device cuda:0 \
     --batch_size 64
+    --output_path outputs
 ```
 
 ### Hugging Face `transformers`
