@@ -9,11 +9,24 @@ import numpy as np
 import sacrebleu
 import sklearn.metrics
 
-from lm_eval.api.registry import register_aggregation, register_metric
+from lm_eval.api.registry import AGGREGATION_REGISTRY, METRIC_REGISTRY, register_metric, register_aggregation
 
 
 eval_logger = logging.getLogger("lm-eval")
 
+@register_aggregation("rouge_agg")
+def rouge_agg(items):
+    preds = [pred[0] for pred, _, _ in items]
+    refs = [ref for _, ref, _ in items]
+   
+    rouge = hf_evaluate.load('rouge')
+
+    result_metrics = rouge.compute(predictions=preds, references=refs,use_aggregator=True)
+    
+    return result_metrics
+
+
+AGGREGATION_REGISTRY["rouge_agg"] = rouge_agg
 
 # Register Aggregations First
 @register_aggregation("bypass")
@@ -123,6 +136,17 @@ def brier_score(items):  # This is a passthrough function
     gold_one_hot = np.eye(np.max(gold) + 1)[gold]
     predictions = list(zip(*items))[1]
     return np.mean(np.sum((predictions - gold_one_hot) ** 2, axis=1))
+
+@register_metric(
+    metric="rouge_scores",
+    higher_is_better=True,
+    output_type="generate_until",
+    aggregation="rouge_agg",
+)
+def rouge_scores_fn(items):  # This is a passthrough function
+    return items
+
+METRIC_REGISTRY["rouge_scores"] = rouge_scores_fn
 
 
 @register_metric(

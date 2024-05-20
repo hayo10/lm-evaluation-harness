@@ -290,9 +290,19 @@ def make_table(result_dict, column: str = "results", sort_results: bool = True):
                 se = dic[m + "_stderr" + "," + f]
                 if se != "N/A":
                     se = "%.4f" % se
-                values.append([k, version, f, n, m, "%.4f" % v, "±", se])
+                if isinstance(v, dict):
+                    v_list = list(v.values())  # 딕셔너리의 값들을 리스트로 변환
+                    formatted_v_list = ["%.4f" % value for value in v_list]  # 각 값에 대해 포맷 적용
+                    values.append([k, version, f, n, m] + formatted_v_list + ["±", se])  
+                else:
+                    values.append([k, version, f, n, m, "%.4f" % v, "±", se])
             else:
-                values.append([k, version, f, n, m, "%.4f" % v, "", ""])
+                if isinstance(v, dict):
+                    v_list = list(v.values())  # 딕셔너리의 값들을 리스트로 변환
+                    formatted_v_list = ["%.4f" % value for value in v_list]  # 각 값에 대해 포맷 적용
+                    values.append([k, version, f, n, m] + formatted_v_list + ["", ""])  
+                else:
+                    values.append([k, version, f, n, m, "%.4f" % v, "", ""])
             k = ""
             version = ""
     md_writer.value_matrix = values
